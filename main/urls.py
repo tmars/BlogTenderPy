@@ -5,8 +5,9 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'BlogTender.views.home', name='home'),
+    url(r'^$', 'main.views.home', name='home'),
+    
     # url(r'^blog/', include('blog.urls')),
-
+	#url(r'^admin/paser/$', TemplateView.as_view(template_name='admin/parser/parser.html')),
     url(r'^admin/', include(admin.site.urls)),
 )

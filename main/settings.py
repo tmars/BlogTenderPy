@@ -36,6 +36,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'lib.django_object_actions',
+    'blog',
+    'wiki',
+    'lib.parser',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -47,9 +52,9 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'BlogTender.urls'
+ROOT_URLCONF = 'main.urls'
 
-WSGI_APPLICATION = 'BlogTender.wsgi.application'
+WSGI_APPLICATION = 'main.wsgi.application'
 
 
 # Database
@@ -57,15 +62,18 @@ WSGI_APPLICATION = 'BlogTender.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'blog_tender',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '',
     }
 }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'UTC'
 
@@ -79,4 +87,19 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
+STATIC_ROOT = ''
 STATIC_URL = '/static/'
+
+PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
+TEMPLATE_DIRS = (
+    PROJECT_PATH + '/templates/'
+)
+TEMPLATE_LOADERS = (
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+    'apptemplates.Loader',
+)
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, "main", "static"),
+)
+MEDIA_URL = ''
