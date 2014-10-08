@@ -32,23 +32,26 @@ class Brand(models.Model):
     site = models.CharField(max_length=200, blank=True)
     image = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
+    verified = models.BooleanField(default=False)
     
     def __str__(self):
-        return self.name
+        return unicode(self)
 
     def __unicode__(self):
-        return self.name
+        return '#%d %s' % (self.id, self.name)
 
 class Category(models.Model):
     objects = MyManager()
+    verified = models.BooleanField(default=False)
     
     name = models.CharField(max_length=200)
 
     def __str__(self):
-        return self.name
+        return unicode(self)
 
     def __unicode__(self):
-        return self.name
+        return '#%d %s' % (self.id, self.name)
+
 
 class Product(models.Model):
     objects = MyManager()
@@ -57,21 +60,30 @@ class Product(models.Model):
     image = models.CharField(max_length=200, blank=True)
     brand = models.ForeignKey(Brand, null=True)
     category = models.ForeignKey(Category, null=True)
-    substance = models.ForeignKey('Substance', null=True)
+    substance = models.ForeignKey('Substance', blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-
+    verified = models.BooleanField(default=False)
+    
     def __str__(self):
-        return self.name + " (%s)" % str(self.brand) if self.brand else " (-)" 
-
+        return unicode(self)
+    
     def __unicode__(self):
-        return self.name + " (%s)" % str(self.brand) if self.brand else " (-)" 
+        try:
+            b = unicode(self.brand)
+        except:
+            b = '-'
+        try:
+            c = unicode(self.category)
+        except:
+            c = '-'    
+        return "#%d %s (%s) [%s]" % (self.id, self.name, b, c)
 
 class Shop(models.Model):
     name = models.CharField(max_length=200)
     site = models.CharField(max_length=200)
     image = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
-
+    
     def __str__(self):
         return self.name
 
@@ -88,6 +100,7 @@ class ShopHasProduct(models.Model):
     image = models.CharField(max_length=200, blank=True, null=True)
     available = models.NullBooleanField()
     additional_data = models.TextField(blank=True, null=True)
+    verified = models.BooleanField(default=False)
     
     def __str__(self):
         return self.name

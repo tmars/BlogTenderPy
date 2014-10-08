@@ -67,7 +67,11 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': '',
         'HOST': '',
+        'OPTIONS': {
+            'init_command': 'SET foreign_key_checks = 0;',
+        },
     }
+        
 }
 
 # Internationalization
@@ -97,7 +101,7 @@ TEMPLATE_DIRS = (
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-    'apptemplates.Loader',
+    'lib.apptemplates.Loader',
 )
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "main", "static"),
