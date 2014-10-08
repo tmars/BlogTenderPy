@@ -1,5 +1,6 @@
 from django.db import models
 import json, re, operator
+from lib.mptt.models import MPTTModel, TreeForeignKey
 
 class MyManager(models.Manager):
     def split_words(self, string):
@@ -52,6 +53,17 @@ class Category(models.Model):
     def __unicode__(self):
         return '#%d %s' % (self.id, self.name)
 
+class CategoryGroup(MPTTModel):
+    name = models.CharField(max_length=200, unique=True)
+    parent = TreeForeignKey('self', null=True, blank=True, related_name='children')
+    categories = models.ManyToManyField(Category)
+
+    def __str__(self):
+        return unicode(self)
+
+    def __unicode__(self):
+        return '#%d %s' % (self.id, self.name)
+        
 
 class Product(models.Model):
     objects = MyManager()

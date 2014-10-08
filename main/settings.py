@@ -37,10 +37,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'lib.django_object_actions',
+    'lib',
+    'lib.mptt',
     'blog',
     'wiki',
-    'lib.parser',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -95,12 +95,17 @@ STATIC_ROOT = ''
 STATIC_URL = '/static/'
 
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
+LIB_PATH = os.path.join(BASE_DIR, "lib")
+
 TEMPLATE_DIRS = (
-    PROJECT_PATH + '/templates/'
+    os.path.join(PROJECT_PATH, "templates"),
+    os.path.join(LIB_PATH, "mptt", "templates"),
+    
 )
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
+    'lib.apptemplates.Loader',
     'lib.apptemplates.Loader',
 )
 STATICFILES_DIRS = (

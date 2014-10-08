@@ -2,9 +2,10 @@
 
 from django.contrib import admin
 from django import forms
-from wiki.models import Brand, Product, Shop, ShopHasProduct, Substance, Category
+from wiki.models import Brand, Product, Shop, ShopHasProduct, Substance, Category, CategoryGroup
 from lib.parser import ProductParser, parseCSV
 from lib.django_object_actions import DjangoObjectActions
+from lib.mptt.admin import MPTTModelAdmin
 from django.http import HttpResponse
 import re
 
@@ -308,3 +309,13 @@ class CategoryAdmin(admin.ModelAdmin, DjangoObjectActions):
 	form = CategoryForm
 	
 admin.site.register(Category, CategoryAdmin)
+
+####################
+## CategoryGroup object
+####################
+
+class CategoryGroupAdmin(MPTTModelAdmin):
+    # speficfy pixel amount for this ModelAdmin only:
+    mptt_level_indent = 20
+
+admin.site.register(CategoryGroup, CategoryGroupAdmin)

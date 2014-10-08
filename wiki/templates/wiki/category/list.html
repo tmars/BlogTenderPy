@@ -1,0 +1,27 @@
+{% extends "main/base.html" %}
+{% load mptt_tags %}
+
+{% block content %}
+<nav class="ink-navigation">
+	<ul class="menu vertical black">
+		{% recursetree list %}
+	        <li>
+	            <a><b>{{ node.name }}</b></a>
+	            {% if not node.is_leaf_node %}
+	                <ul class="submenu">
+	                    {{ children }}
+	                </ul>
+	            {% else %}
+	                <ul class="submenu">
+	            		{% for c in node.categories.all %}
+	                    <li><a href={% url 'category' c.id %}>{{ c.name }}</a></li>
+	                    {% endfor %}
+	                </ul>
+	            {% endif %}
+	        </li>
+	    {% endrecursetree %}
+
+	</ul>
+</nav>
+
+{% endblock %}

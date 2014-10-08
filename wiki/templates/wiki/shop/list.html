@@ -1,0 +1,19 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+
+<div class="column-group gutters">
+{% for s in list %}
+	
+    <div class="all-100">
+    	<h3>{{ s.name }}</h3>
+        <img src="{{ s.image }}" align="left">
+    	<p class="quarter-top-space">{{ s.description }}</p>
+    </div>
+
+{% endfor %}
+</div>
+
+{% include "main/pagination.html" %}
+
+{% endblock %}
