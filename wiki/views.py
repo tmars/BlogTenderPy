@@ -16,6 +16,15 @@ def shop_list(request):
 
 	return render(request, 'wiki/shop/list.html', {"list": shops})
 
+def shop(request, id):
+	s = Shop.objects.get(id=id)
+	cs = Category.objects.raw('SELECT DISTINCT c.* FROM wiki_category c \
+		INNER JOIN wiki_product p ON p.category_id=c.id\
+		INNER JOIN wiki_shophasproduct shp ON shp.product_id=p.id\
+		WHERE shp.shop_id='+id)
+	
+	return render(request, 'wiki/shop/info.html', {'shop': s, 'categories': cs})
+
 
 def category_list(request):
 	categories = CategoryGroup.objects.all()
@@ -25,8 +34,11 @@ def category_list(request):
 def category(request, id):
 	c = Category.objects.get(id=id)
 	product_list = Product.objects.filter(category=c)
-	paginator = Paginator(product_list, 10)
+	
+	if request.GET.get('brand'):
+		product_list = product_list.filter(brand=request.GET.get('brand'))
 
+	paginator = Paginator(product_list, 10)
 	page = request.GET.get('page')
 	try:
 		products = paginator.page(page)
@@ -35,9 +47,9 @@ def category(request, id):
 	except EmptyPage:
 		products = paginator.page(paginator.num_pages)
 
-	return render(request, 'wiki/category/products.html', {"list": products})
+	return render(request, 'wiki/category/products.html', {'list': products, 'category': c})
 
 def product(request, id):
 	p = Product.objects.get(id=id)
-
-	return render(request, 'wiki/product/info.html', {"p": p})
+	shps = ShopHasProduct.objects.filter(product=p,available=True);
+	return render(request, 'wiki/product/info.html', {"p": p, "shps": shps})

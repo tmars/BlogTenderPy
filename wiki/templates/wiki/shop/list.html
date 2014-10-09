@@ -6,7 +6,7 @@
 {% for s in list %}
 	
     <div class="all-100">
-    	<h3>{{ s.name }}</h3>
+    	<h3><a href="{% url 'shop' s.id %}">{{ s.name }}</a></h3>
         <img src="{{ s.image }}" align="left">
     	<p class="quarter-top-space">{{ s.description }}</p>
     </div>

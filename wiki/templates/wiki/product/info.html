@@ -1,6 +1,7 @@
 {% extends "main/base.html" %}
 
 {% block content %}
+
 <div class="column-group gutters">
 	<div class="all-100">
 		<div class="all-100"><h2>{{ p.name }}</h2></div>
@@ -8,8 +9,29 @@
 			<img src="holder.js/200x200/auto/ink">
 		</div>
 		<div class="all-80 small-100">
-			{{ p.description }}
+			<p>ОТ {{ p.min_price }}</p>
+			<p>ДО {{ p.max_price }}</p>
+			<p>СР {{ p.avg_price }}</p>
+			<p>{{ p.description }}</p>
 		</div>	
 	</div>
 </div>
+
+<div class="column-group gutters">
+
+<div class="all-100">
+{% for s in shps %}
+<div class="all-100">
+	<img src="holder.js/100x100/auto/ink" >
+	<h6>{{ s.shop.name }}</h6>
+	<a href="{{ s.url }}">{{ s.name }}</a>
+	<span>{{ s.price }} руб.</span>
+</div>
+{% empty %}
+<i>Не найдено товаров в наличии</i>
+{% endfor %}
+</div>
+
+</div>
+
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends "main/base.html" %}
 
 {% block content %}
-
+<h1>{{ category.name }}</h1>
 <div class="column-group gutters">
 {% for p in list %}
 <div class="all-50 medium-100 small-100 tiny-100">
@@ -10,7 +10,7 @@
     <img src="holder.js/150x150/auto/ink" align="left" class="item-image">
 	<div class="quarter-top-space">{{ p.description }}</div>
 	<div class="push-right all-30">
-		<p>от <b>123</b> руб.<p>
+		<p>от <b>{{ p.min_price }}</b> руб.<p>
 		<a href="{% url 'product' p.id %}"><button class="ink-button">Цены</button></a>
 	</div>
 </div>
