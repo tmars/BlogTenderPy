@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
+SITE_URL = 'http://tmars.ru.mcpre.ru'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -63,10 +63,10 @@ WSGI_APPLICATION = 'main.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'blog_tender',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '',
+        'NAME': 'a118692_1',
+        'USER': 'a118692_1',
+        'PASSWORD': 'Bxu1wjpxys59',
+        'HOST': 'a118692.mysql.mchost.ru',
         'OPTIONS': {
             'init_command': 'SET foreign_key_checks = 0;',
         },
@@ -90,9 +90,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-
-STATIC_ROOT = ''
-STATIC_URL = '/static/'
+ADMIN_MEDIA_PREFIX  = '/static/admin'
+STATIC_ROOT = '/home/httpd/vhosts/tmars.ru/httpdocs'
+STATIC_URL = '/'
 
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 LIB_PATH = os.path.join(BASE_DIR, "lib")
@@ -108,7 +108,5 @@ TEMPLATE_LOADERS = (
     'lib.apptemplates.Loader',
     'lib.apptemplates.Loader',
 )
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, "main", "static"),
-)
+
 MEDIA_URL = ''

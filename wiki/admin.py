@@ -14,9 +14,9 @@ import re
 ####################
 class ShopForm(forms.ModelForm):
 	csv_import = forms.FileField(label=u'Файл импорта', required=False)
-	
 	class Meta:
 		model = Shop
+		exclude = []
 
 	def save(self, commit=True):
 		instance = super(ShopForm, self).save(commit=False)
