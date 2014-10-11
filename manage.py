@@ -1,8 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/python2.7
 import os
 import sys
+from main import settings
 
-sys.path.insert(0, "/home/httpd/vhosts/tmars.ru/private")
+sys.path.insert(0, os.path.join(settings.ROOT_DIR, "private"))
 sys.path.insert(0, "/usr/lib64/python2.6/site-packages")
 
 if __name__ == "__main__":

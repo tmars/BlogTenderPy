@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-SITE_URL = 'http://tmars.ru.mcpre.ru'
+ROOT_DIR = os.path.dirname(os.path.dirname(BASE_DIR))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -90,17 +90,19 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-ADMIN_MEDIA_PREFIX  = '/static/admin'
-STATIC_ROOT = '/home/httpd/vhosts/tmars.ru/httpdocs'
+STATIC_ROOT = os.path.join(ROOT_DIR, "httpdocs")
 STATIC_URL = '/'
+MEDIA_URL = ''
+
+STATICFILES_DIRS = (
+	os.path.join(BASE_DIR, "static"),
+)
 
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
-LIB_PATH = os.path.join(BASE_DIR, "lib")
 
 TEMPLATE_DIRS = (
     os.path.join(PROJECT_PATH, "templates"),
-    os.path.join(LIB_PATH, "mptt", "templates"),
-    
+    os.path.join(BASE_DIR, "lib", "mptt", "templates"),   
 )
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -108,5 +110,3 @@ TEMPLATE_LOADERS = (
     'lib.apptemplates.Loader',
     'lib.apptemplates.Loader',
 )
-
-MEDIA_URL = ''
