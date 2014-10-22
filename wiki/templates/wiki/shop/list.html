@@ -6,9 +6,9 @@
 {% for s in list %}
 	
     <div class="all-100">
+    	<img src="holder.js/100x100/auto/ink" align="left">
     	<h3><a href="{% url 'shop' s.id %}">{{ s.name }}</a></h3>
-        <img src="{{ s.image }}" align="left">
-    	<p class="quarter-top-space">{{ s.description }}</p>
+        <p class="quarter-top-space">{{ s.description }}</p>
     </div>
 
 {% endfor %}

@@ -2,6 +2,7 @@
 
 from grab.spider import Spider, Task
 import urlparse, sys, re, hashlib
+from time import sleep
 
 class BaseSpider(Spider):
     def __init__(self, parser, *args, **kwargs):
@@ -47,13 +48,27 @@ class ScanSpider(BaseSpider):
     def task_initial(self, grab, task):
         self.old_urls.add(task.url)
         
+        if grab.response.code != 200:
+            if task.task_try_count > 1:
+                sleep(task.task_try_count * 0.1)
+            
+            task = Task('initial', url=grab.config['url'], task_try_count=task.task_try_count + 1, valid_status=task.valid_status)
+            self.add_task(task)
+            return
+
         # ищем информацию на странице
-        info = self.parser.parse_info(grab)
+        try:
+            info = self.parser.parse_info(grab)
+        except:
+            info = None
+
         if info:
             info['url'] = task.url
             # исключаем повторения
-            data = ''.join([info[k] for k in self.hash_keys]).encode(sys.stdout.encoding)
-            h = hashlib.md5(data).hexdigest()
+            m = hashlib.md5()
+            for k in self.hash_keys:
+                m.update(info[k].encode('utf-8'))
+            h = m.hexdigest()
             if h not in self.infos or len(task.url) < len(self.infos[h]['url']):
                 self.infos[h] = info
             
@@ -72,7 +87,7 @@ class ScanSpider(BaseSpider):
             return
 
         # отбираем
-        if url[-4:] in ['.jpg', '.css', '.png', '.mp3', '.avi', '.svg', '.pdf']:
+        if url[-4:] in ['.jpg', '.css', '.png', '.mp3', '.avi', '.svg', '.pdf', '.ico']:
             return
 
         # преобразование и проверка на домен
@@ -97,4 +112,8 @@ class ScanSpider(BaseSpider):
             return
 
         self.new_urls.add(url)
-        self.add_task(Task('initial', url=url))
+        task = Task('initial', 
+            url=url, 
+            valid_status=(200, 403, 500)
+        )
+        self.add_task(task)

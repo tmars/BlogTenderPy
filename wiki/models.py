@@ -76,9 +76,9 @@ class Product(models.Model):
     description = models.TextField(blank=True, null=True)
     verified = models.BooleanField(default=False)
     
-    avg_price = models.DecimalField(max_digits=10, decimal_places=0)
-    min_price = models.DecimalField(max_digits=10, decimal_places=0)
-    max_price = models.DecimalField(max_digits=10, decimal_places=0)
+    avg_price = models.DecimalField(max_digits=10, decimal_places=0, null=True)
+    min_price = models.DecimalField(max_digits=10, decimal_places=0, null=True)
+    max_price = models.DecimalField(max_digits=10, decimal_places=0, null=True)
     
 
     def __str__(self):
@@ -100,12 +100,50 @@ class Shop(models.Model):
     site = models.CharField(max_length=200)
     image = models.CharField(max_length=200, blank=True)
     description = models.TextField(blank=True)
+    selectors = models.TextField(blank=True, null=True)
+    excludes = models.TextField(blank=True, null=True)
+    product_url = models.CharField(max_length=200, blank=True, null=True)
+    scanning = models.BooleanField(default=False)
     
     def __str__(self):
         return self.name
 
     def __unicode__(self):
         return self.name
+    
+    def get_selectors(self):
+        return json.loads(self.selectors)
+        
+    def get_excludes(self):
+        return self.excludes.splitlines()
+        
+    default_selectors = '''
+    {
+        "name": {
+            "path": "",
+            "type": "text"
+        },
+        "price": {
+            "path": "",
+            "type": "text"
+        },
+        "image": {
+            "path": "",
+            "type": "attr@href"
+        },
+        "available": {
+            "path": "",
+            "type": "exist"
+        },
+        "category": {
+            "path": "",
+            "type": "text"
+        },
+        "brand": {
+            "path": "",
+            "type": "text"
+        }
+    }'''
 
 class ShopHasProduct(models.Model):
     product = models.ForeignKey(Product, blank=True, null=True)
@@ -116,23 +154,16 @@ class ShopHasProduct(models.Model):
     name = models.CharField(max_length=200)
     image = models.CharField(max_length=200, blank=True, null=True)
     available = models.NullBooleanField()
-    additional_data = models.TextField(blank=True, null=True)
     verified = models.BooleanField(default=False)
     
+    brand_str = models.CharField(max_length=200, blank=True, null=True)
+    category_str = models.CharField(max_length=200, blank=True, null=True)
+
     def __str__(self):
         return self.name
 
     def __unicode__(self):
         return self.name
-
-    def get_addit(self, key):
-        try:
-            data = json.loads(self.additional_data)
-            if data and key in data:
-                return data[key]
-        except:
-            pass
-        return ''
 
 class Substance(models.Model):
     name = models.CharField(max_length=200)

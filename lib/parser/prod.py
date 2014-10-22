@@ -23,18 +23,17 @@ def merge(a, b, path=None):
 class ProductParser():
 	data_keys = ['url', 'name', 'image', 'price', 'available']
 
-	def __init__(self, config):
+	def __init__(self, host, selectors):
 		c = {
 			'name': {'required': '1'},
 			'price': {'parser': 'price', 'required': '1'},
 			'image': {'parser': 'url', 'required': '0'},
-			'available': {'required': '0'}
+			'available': {'required': '0'},
+			'brand': {'required': '0'},
+			'category': {'required': '0'},
 		};
-		self.selectors = merge(config['selectors'], c)
-		self.host = config['host']
-		self.excludes = []
-		if 'excludes' in  config:
-			self.excludes = config['excludes']
+		self.selectors = merge(selectors, c)
+		self.host = host
 
 	def update(self, urls):
 		logging.basicConfig(level=logging.DEBUG)
@@ -43,16 +42,16 @@ class ProductParser():
 			'price': self.selectors['price'],
 			'available': self.selectors['available'],
 		})
-		spider = UpdateSpider(urls=urls, parser=parser, thread_number=8)
+		spider = UpdateSpider(urls=urls, parser=parser, thread_number=1)
 		spider.run()
 		
 		return spider.info_list, ['url', 'price', 'available']
 
-	def scan(self):
+	def scan(self, excludes=[]):
 		logging.basicConfig(level=logging.DEBUG)
 
 		parser = InfoParser(self.selectors)
-		spider = ScanSpider(host=self.host, parser=parser, thread_number=8, excludes=self.excludes)
+		spider = ScanSpider(host=self.host, parser=parser, thread_number=32, excludes=excludes)
 		spider.run()
 
 		infos = spider.info_list

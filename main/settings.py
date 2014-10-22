@@ -39,6 +39,7 @@ INSTALLED_APPS = (
 
     'lib',
     'lib.mptt',
+
     'blog',
     'wiki',
 )
@@ -103,6 +104,7 @@ PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 TEMPLATE_DIRS = (
     os.path.join(PROJECT_PATH, "templates"),
     os.path.join(BASE_DIR, "lib", "mptt", "templates"),   
+    os.path.join(BASE_DIR, "lib", "django_object_actions", "templates"),   
 )
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',

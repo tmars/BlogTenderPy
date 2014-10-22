@@ -1,7 +1,7 @@
 #coding=utf8
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
-from wiki.models import Product, ShopHasProduct
+from wiki.models import Product
 
 class Command(BaseCommand):
     help = u'Освежает макс/мин/сред цены у товаров'
@@ -25,4 +25,5 @@ class Command(BaseCommand):
                 product.max_price = maxp
                 product.save()
             ind += 1
-            print "%d/%d" % (ind, len(products))
+            
+            self.stdout.write("%d/%d" % (ind, len(products)))

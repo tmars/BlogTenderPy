@@ -1,67 +1,137 @@
 #coding=utf8
 
 from django.contrib import admin
+from django.shortcuts import render, render_to_response
 from django import forms
+from django.http import HttpResponse
+from django.conf import settings
+
 from wiki.models import Brand, Product, Shop, ShopHasProduct, Substance, Category, CategoryGroup
-from lib.parser import ProductParser, parseCSV
+
 from lib.django_object_actions import DjangoObjectActions
 from lib.mptt.admin import MPTTModelAdmin
-from django.http import HttpResponse
-import re
 
+import re
+import sys, os
 ####################
 ## Shop object
 ####################
 class ShopForm(forms.ModelForm):
-	csv_import = forms.FileField(label=u'Файл импорта', required=False)
 	class Meta:
 		model = Shop
-		exclude = []
+		exclude = ['selectors', 'product_url']
 
-	def save(self, commit=True):
-		instance = super(ShopForm, self).save(commit=False)
-		if commit:
-		    instance.save()
-		if self.cleaned_data['csv_import']:
-			data = parseCSV(self.cleaned_data['csv_import'].read())
-			if len(data):
-				for d in ProductParser.pack(data):
-					v = ShopHasProduct()
-					v.shop = instance
-					v.url = d['url']
-					v.name = d['name']
-					v.price = d['price']
-					v.image = d['image']
-					v.available = d['available']
-					v.additional_data = d['additional']
+	# def save(self, commit=True):
+	# 	instance = super(ShopForm, self).save(commit=False)
+	# 	if commit:
+	# 		instance.save()
+	# 	if self.cleaned_data['csv_import']:
+	# 		data = parseCSV(self.cleaned_data['csv_import'].read())
+	# 		if len(data):
+	# 			for d in ProductParser.pack(data):
+	# 				v = ShopHasProduct()
+	# 				v.shop = instance
+	# 				v.url = d['url']
+	# 				v.name = d['name']
+	# 				v.price = d['price']
+	# 				v.image = d['image']
+	# 				v.available = d['available']
+	# 				v.additional_data = d['additional']
 					
-					p, f = Product.objects.get_or_create(name=v.name)
+	# 				p, f = Product.objects.get_or_create(name=v.name)
 					
-					if f:
-						bn = v.get_addit('brand')
-						if len(bn):
-							b, f = Brand.objects.get_or_create(name=bn)
-							p.brand = b
+	# 				if f:
+	# 					bn = v.get_addit('brand')
+	# 					if len(bn):
+	# 						b, f = Brand.objects.get_or_create(name=bn)
+	# 						p.brand = b
 						
-						cn = v.get_addit('category')
-						if len(cn):
-							c, f = Category.objects.get_or_create(name=cn)
-							p.category = c
+	# 					cn = v.get_addit('category')
+	# 					if len(cn):
+	# 						c, f = Category.objects.get_or_create(name=cn)
+	# 						p.category = c
 						
-						p.image = v.image
-						p.save()
+	# 					p.image = v.image
+	# 					p.save()
 					
-					v.product = p
-					v.save()
+	# 				v.product = p
+	# 				v.save()
 					
-		return instance
-        
-class ShopAdmin(admin.ModelAdmin):
+	# 	return instance
+		
+class ShopAdmin(DjangoObjectActions, admin.ModelAdmin):
 	form = ShopForm
 
 	#def add_view(self, request, *args, **kwargs):
 	#	print request.GET.keys()
 	#	return super(ShopAdmin, self).add_view(request, *args, **kwargs)
+
+	objectactions = ['set_parser', 'scan_product']
+
+	def get_object_actions(self, request, context, **kwargs):
+		if context['original'].scanning:
+			return ['set_parser']
+		return self.objectactions
+
+	# проверка парсера на товаре
+	def set_parser(self, request, obj):
+		class Form(forms.Form):
+			url = forms.URLField(label='Ссылка на товар', required=False)
+			selectors = forms.CharField(label='Конфигурация', required=True,
+				widget=forms.Textarea(attrs={'cols': '100', 'rows': '40'}))
+		
+		info = {}
+
+		if request.method == 'POST':
+			form = Form(request.POST)
+			
+			if form.is_valid():
+				obj.selectors = form.cleaned_data['selectors']
+				obj.product_url = form.cleaned_data['url']
+				obj.save()
+				
+				# если установлен проверочный адрес
+				if form.cleaned_data['url']:
+					
+					from django.forms.util import ErrorList
+					from lib.parser import ProductParser
+
+					errors = form.errors.setdefault("__all__", ErrorList())
+					
+					try:
+						p = ProductParser(obj.site, obj.get_selectors())
+						data = p.find(form.cleaned_data['url'])
+						
+						if data is None:
+							errors.append("Сведения о товаре не найдены")
+						else:
+							info = data 
+					
+					except Exception as e:
+						exc_type, exc_obj, exc_tb = sys.exc_info()
+						fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+						errors.append("Ошибка парсера:%s %s %s" % (str(e), fname, exc_tb.tb_lineno))
+		else:
+			form = Form(initial={
+				'selectors': obj.selectors or obj.default_selectors,
+				'url': obj.product_url
+			})
+				
+		from django.template import RequestContext
+		
+		return render_to_response('admin/shop/parse_product.html', 
+			{'form': form, 'info': info}, RequestContext(request))
+
+	set_parser.label = "Настроить парсер"
+
+	# проверка парсера на товаре
+	def scan_product(self, request, obj):
+		import subprocess
+		pid = subprocess.Popen(["%s/manage.py" % settings.BASE_DIR, 'scan_shop', str(obj.id)],
+			stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE).pid
+		
+
+	scan_product.label = "Искать товары"
 
 admin.site.register(Shop, ShopAdmin)
 
@@ -80,7 +150,7 @@ class ShopHasProductForm(forms.ModelForm):
 	class Meta:
 		model = ShopHasProduct
 		fields = ['name','product', 'product_name', 'product_brand_s', 'product_brand', 'product_category_s', 'product_category',\
-			'url', 'image','price','available','additional_data']
+			'url', 'image','price','available']
 
 	def __init__(self, *args, **kwargs):
 		super(ShopHasProductForm, self).__init__(*args, **kwargs)
@@ -106,17 +176,17 @@ class ShopHasProductForm(forms.ModelForm):
 				self.fields['product_name'].initial = obj.name
 				
 				help_text = '<style>'
-				brands, f = Brand.objects.order_by_search('name', obj.get_addit('brand'))
+				brands, f = Brand.objects.order_by_search('name', obj.brand_str)
 				self.fields['product_brand_s'].choices = [(-1,'-- создать --')] + [(p.id, p.name) for p in brands]
 				self.fields['product_brand_s'].initial = brands[0].id if f else -1
-				self.fields['product_brand'].initial = obj.get_addit('brand')
-				if f and obj.get_addit('brand').lower() == brands[0].name.lower(): help_text += '.field-product_brand {display:none}'
+				self.fields['product_brand'].initial = obj.brand_str
+				if f and obj.brand_str.lower() == brands[0].name.lower(): help_text += '.field-product_brand {display:none}'
 				
-				categories, f = Category.objects.order_by_search('name', obj.get_addit('category'))
+				categories, f = Category.objects.order_by_search('name', obj.category_str)
 				self.fields['product_category_s'].choices = [(-1,'-- создать --')] + [(p.id, p.name) for p in categories]
 				self.fields['product_category_s'].initial = categories[0].id if f else -1
-				self.fields['product_category'].initial = obj.get_addit('category')
-				if f and obj.get_addit('category').lower() == categories[0].name.lower(): help_text += '.field-product_category {display:none}'
+				self.fields['product_category'].initial = obj.category_str
+				if f and obj.category_str.lower() == categories[0].name.lower(): help_text += '.field-product_category {display:none}'
 				
 				help_text += '</style>'
 				
@@ -183,16 +253,12 @@ class ShopHasProductForm(forms.ModelForm):
 		return instance
 	
 
-class ShopHasProductAdmin(admin.ModelAdmin, DjangoObjectActions):
+class ShopHasProductAdmin(admin.ModelAdmin):
 
 	form = ShopHasProductForm
 	ordering = ['verified', 'name']
 	list_filter = ['product__category']
 	list_display = ['name', 'verified', 'product', 'shop']
-	
-	def get_object_actions(self, request, context, **kwargs):
-		#print dir(admin.ModelAdmin)
-		return self.objectactions
 
 admin.site.register(ShopHasProduct, ShopHasProductAdmin)
 
@@ -228,7 +294,7 @@ class BrandForm(forms.ModelForm):
 		return instance
 	
 			
-class BrandAdmin(admin.ModelAdmin, DjangoObjectActions):
+class BrandAdmin(admin.ModelAdmin):
 	ordering = ['verified', 'name']
 	list_display = ['name', 'verified']
 	form = BrandForm
@@ -264,7 +330,7 @@ class ProductForm(forms.ModelForm):
 		return instance
 	
 			
-class ProductAdmin(admin.ModelAdmin, DjangoObjectActions):
+class ProductAdmin(admin.ModelAdmin):
 	ordering = ['verified', 'name']
 	list_filter = ['category', 'brand']
 	list_display = ['name', 'verified']
@@ -303,7 +369,7 @@ class CategoryForm(forms.ModelForm):
 				str(obj.id)+'\', \'Продукты\', \'height=500,width=800,resizable=yes,scrollbars=yes\')" target="_blank">В магазинах</a>'
 	
 			
-class CategoryAdmin(admin.ModelAdmin, DjangoObjectActions):
+class CategoryAdmin(admin.ModelAdmin):
 	ordering = ['verified', 'name']
 	list_display = ['name', 'verified']
 	form = CategoryForm
@@ -315,7 +381,7 @@ admin.site.register(Category, CategoryAdmin)
 ####################
 
 class CategoryGroupAdmin(MPTTModelAdmin):
-    # speficfy pixel amount for this ModelAdmin only:
-    mptt_level_indent = 20
+	# speficfy pixel amount for this ModelAdmin only:
+	mptt_level_indent = 20
 
 admin.site.register(CategoryGroup, CategoryGroupAdmin)
