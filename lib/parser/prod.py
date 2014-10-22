@@ -51,7 +51,7 @@ class ProductParser():
 		logging.basicConfig(level=logging.DEBUG)
 
 		parser = InfoParser(self.selectors)
-		spider = ScanSpider(host=self.host, parser=parser, thread_number=32, excludes=excludes)
+		spider = ScanSpider(host=self.host, parser=parser, thread_number=1, excludes=excludes)
 		spider.run()
 
 		infos = spider.info_list

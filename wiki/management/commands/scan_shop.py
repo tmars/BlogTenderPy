@@ -24,6 +24,7 @@ class Command(BaseCommand):
         products, keys, urls = parser.scan(shop.get_excludes())
         self.stdout.write('Finded %d products' % len(products))
         for p in products:
+            print p 
             v = ShopHasProduct()
             v.shop = shop
             v.url = p['url']

@@ -75,7 +75,7 @@ class ScanSpider(BaseSpider):
         # выборка ссылок
         link = grab.doc.select('//*[@href]')
         for s in link:
-            url = s.attr('href').lower()
+            url = s.attr('href')
             try:
                 url = grab.make_url_absolute(url)
                 self.create_task(url)    

@@ -61,6 +61,7 @@ class ShopForm(forms.ModelForm):
 		
 class ShopAdmin(DjangoObjectActions, admin.ModelAdmin):
 	form = ShopForm
+	list_display = ['name', 'scanning']
 
 	#def add_view(self, request, *args, **kwargs):
 	#	print request.GET.keys()
