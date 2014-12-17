@@ -7,7 +7,7 @@
 <div class="all-50 medium-100 small-100 tiny-100">
 	<h3>{{ p.name }}</h3>
 	<h4>{{ p.brand.name }}</h4>
-    <img src="holder.js/150x150/auto/ink" align="left" class="item-image">
+	<img src="{% if p.image %}{{ p.image }}{% else %}holder.js/150x150/auto/ink{% endif %}" class="product-preview">
 	<div class="quarter-top-space">{{ p.description }}</div>
 	<div class="push-right all-30">
 		<p>от <b>{{ p.min_price }}</b> руб.<p>
