@@ -1,25 +1,22 @@
 #coding=utf8
 
+import re
+import sys, os
+
 from django.contrib import admin
 from django.shortcuts import render, render_to_response
 from django import forms
 from django.http import HttpResponse
 from django.conf import settings
 
-from wiki.models import Brand, Product, Shop, ShopHasProduct, Substance, Category, CategoryGroup
-
-from lib.django_object_actions import DjangoObjectActions
-from lib.mptt.admin import MPTTModelAdmin
-
-import re
-import sys, os
-
-
-from cuser.middleware import CuserMiddleware
-	
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION 
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_unicode
+
+from wiki.models import Brand, Product, Shop, ShopHasProduct, Substance, Category, CategoryGroup
+
+from lib.django_object_actions import DjangoObjectActions
+from lib.cuser.middleware import CuserMiddleware	
 
 def log_entry_add(obj):
 	log_entry_fix(obj, ADDITION)
@@ -410,6 +407,7 @@ admin.site.register(Category, CategoryAdmin)
 ####################
 ## CategoryGroup object
 ####################
+from lib.mptt.admin import MPTTModelAdmin
 
 class CategoryGroupAdmin(MPTTModelAdmin):
 	# speficfy pixel amount for this ModelAdmin only:

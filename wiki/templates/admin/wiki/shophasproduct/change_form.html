@@ -10,7 +10,7 @@ $(document).ready(function() {
 	$(".select_list").change(function(){
 		var n = $(this).attr("name");
 		n = n.substring(0, n.length-2);
-		var obj = $(".field-"+n);
+		var obj = $(".field-"+n+',.'+n);
 		if ($(this).val() == -1) {
 			obj.show();
 		} else {
