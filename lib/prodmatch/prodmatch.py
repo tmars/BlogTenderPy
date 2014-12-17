@@ -67,11 +67,12 @@ class ProductMatcher:
 				t = abs(d1-d2)/((d1+d2)/2)
 				if t < 0.1:
 					sd += (1-t)*(1-t)
-		
-		return 0.3 * (sw/pw) + \
-			0.3 * (sn/pn) + \
-			0.25 * (sb/pb) + \
-			0.25 * (sd/pd)
+		res = 0
+		if pw > 0: res += 0.3 * (sw/pw)
+		if pn > 0: res += 0.3 * (sn/pn)
+		if pb > 0: res += 0.25 * (sb/pb)
+		if pd > 0: res += 0.25 * (sd/pd)
+		return res
 
 	def ordering(self, matches, reverse=False):
 		if len(matches):

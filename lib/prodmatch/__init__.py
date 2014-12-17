@@ -1,0 +1,3 @@
+from .prodmatch import (
+    ProductMatcher
+)

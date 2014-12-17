@@ -158,7 +158,7 @@ class ShopHasProductManager(MyManager):
 		#qset = super(ShopHasProductManager, self).get_queryset()
 		logger = logging.getLogger('MYAPP')
 
-		from prodmatch import ProductMatcher
+		from lib.prodmatch import ProductMatcher
 		import operator
 
 		matcher = ProductMatcher()
