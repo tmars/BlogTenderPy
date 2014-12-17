@@ -43,10 +43,19 @@ INSTALLED_APPS = (
 
     'lib.mptt',
     'lib.cuser',
+    'lib.social_auth',
 
     'blog',
     'wiki',
 )
+
+AUTHENTICATION_BACKENDS = (
+    'lib.social_auth.backends.contrib.vk.VKOAuth2Backend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+VK_APP_ID = '123'
+VK_API_SECRET = '123'
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

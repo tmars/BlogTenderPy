@@ -10,4 +10,5 @@ urlpatterns = patterns('',
     url(r'^', include('wiki.urls')),
 	url(r'^admin/', include(admin.site.urls)),
 	url(r'^grappelli/', include('grappelli.urls')), # grappelli URLS
+	url(r'', include('social_auth.urls')),
 )
