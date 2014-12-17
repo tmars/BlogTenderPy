@@ -39,6 +39,7 @@ INSTALLED_APPS = (
 
     'lib',
     'lib.mptt',
+    'cuser',
 
     'blog',
     'wiki',
@@ -51,6 +52,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'cuser.middleware.CuserMiddleware',
 )
 
 ROOT_URLCONF = 'main.urls'
@@ -103,6 +105,7 @@ PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 
 TEMPLATE_DIRS = (
     os.path.join(PROJECT_PATH, "templates"),
+    os.path.join(BASE_DIR, "wiki", "templates"),
     os.path.join(BASE_DIR, "lib", "mptt", "templates"),   
     os.path.join(BASE_DIR, "lib", "django_object_actions", "templates"),   
 )
@@ -112,3 +115,49 @@ TEMPLATE_LOADERS = (
     'lib.apptemplates.Loader',
     'lib.apptemplates.Loader',
 )
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'standard': {
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+    },
+    'handlers': {
+        'null': {
+            'level':'DEBUG',
+            'class':'django.utils.log.NullHandler',
+        },
+        'logfile': {
+            'level':'DEBUG',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': ROOT_DIR + "/logs/logfile",
+            'maxBytes': 50000,
+            'backupCount': 2,
+            'formatter': 'standard',
+        },
+        'console':{
+            'level':'INFO',
+            'class':'logging.StreamHandler',
+            'formatter': 'standard'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'propagate': True,
+            'level':'WARN',
+        },
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'MYAPP': {
+            'handlers': ['logfile'],
+            'level': 'DEBUG',
+        },
+    }
+}

@@ -3,7 +3,3 @@ from .pcsv import (
     saveCSV,
     parseCSV
 )
-
-from .prod import (
-	ProductParser,
-)

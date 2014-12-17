@@ -1,0 +1,52 @@
+<script src="//cdnjs.cloudflare.com/ajax/libs/floatthead/1.2.8/jquery.floatThead.min.js"></script>
+
+<style>
+#id_similars {display: none;}
+table.similars tr.checked {background-color: #BEDAFF;}
+table.similars thead {background-color: #FFFFCC;}
+</style>
+
+<table class="similars">
+{% for item in items %}
+{% if forloop.counter == 1 %}<thead>{%endif%}
+<tr>
+	<td>{{ forloop.counter }}</td>
+	<td>{% if forloop.counter > 1 %}<input id="id_similars_{{ ind }}" name="similars" type="checkbox" value="{{ item.id }}">{% endif %}</td>
+	<td style="text-align:center;vertical-align:middle;">
+		<img src="{{ item.image }}" style="max-width:100px; max-height: 100px;">
+	</td>
+	<td><a target="_blank" href="{{ item.url }}">{{ item.name }}</a></td>
+	<td>{{ item.brand }}</td>
+	<td>{{ item.shop }}</td>
+	<td>{{ item.category }}</td>
+	<td>{{ item.packing }}</td>
+	<td>{{ item.price }}</td>
+</tr>
+{% if forloop.counter == 1 %}</thead>{%endif%}
+{% endfor %}
+</table>
+
+<script>
+$(document).ready(function() {
+	// Таблица схожих
+	var tbl = $('table.similars');
+	tbl.find('tbody>tr').click(function() {
+		$(this).find('input').click();
+	});
+	tbl.find('tbody tr input').click(function() {
+		if ($(this).is(":checked"))
+			$(this).closest('tr').addClass('checked');
+		else
+			$(this).closest('tr').removeClass('checked');
+	});
+	tbl.find('thead td').each(function(ind,obj) {
+		var w = $(obj).width();
+		$(obj).width(w);
+		tbl.find('tbody tr:first-child td').eq(ind).width(w);
+	});
+	tbl.floatThead({
+		useAbsolutePositioning: false
+	}); 
+});
+</script>
+

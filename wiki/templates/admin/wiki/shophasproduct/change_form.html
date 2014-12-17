@@ -1,0 +1,31 @@
+{% extends 'admin:admin/change_form.html' %}
+
+{% block branding %}
+
+{{ block.super }}
+
+<script>
+$(document).ready(function() {
+	// Форма создания товара
+	$(".select_list").change(function(){
+		var n = $(this).attr("name");
+		n = n.substring(0, n.length-2);
+		var obj = $(".field-"+n);
+		if ($(this).val() == -1) {
+			obj.show();
+		} else {
+			obj.hide();
+		}
+	});
+	$("#id_product").change(function(){
+		if ($(this).val() == "") {
+			$(".field-product_name").show();
+			$(".if_not_product").closest("div.form-row").show()
+		} else {
+			$(".field-product_name").hide();
+			$(".if_not_product").closest("div.form-row").hide()
+		}
+	});
+});
+</script>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'admin:admin/base_site.html' %}
+
+{% block branding %}
+{{ block.super }}
+<script>
+var jQuery = django.jQuery.noConflict(true);
+var $=jQuery;
+</script>
+{% endblock %}
