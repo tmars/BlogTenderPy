@@ -352,6 +352,8 @@ class ProductForm(forms.ModelForm):
 				shp.product = instance
 				shp.save()
 				log_entry_change(shp)
+			
+			instance.clear_prices()
 
 		if commit:
 			instance.save()

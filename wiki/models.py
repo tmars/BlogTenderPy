@@ -77,11 +77,44 @@ class Product(models.Model):
 	verified = models.BooleanField(default=False)
 	packing = models.CharField(max_length=200, blank=True, null=True)
 
-	avg_price = models.DecimalField(max_digits=10, decimal_places=0, null=True)
-	min_price = models.DecimalField(max_digits=10, decimal_places=0, null=True)
-	max_price = models.DecimalField(max_digits=10, decimal_places=0, null=True)
+	_avg_price = models.DecimalField(db_column='avg_price',max_digits=10, 
+		decimal_places=0, null=True)
+	_min_price = models.DecimalField(db_column='min_price',max_digits=10, 
+		decimal_places=0, null=True)
+	_max_price = models.DecimalField(db_column='max_price',max_digits=10, 
+		decimal_places=0, null=True)
 	
+	def clear_prices(self):
+		self._max_price = None
+		self._min_price = None
+		self._avg_price = None
 
+	def recalc_prices(self):
+		shps = ShopHasProduct.objects.filter(product=self)
+		prices = [shp.price for shp in shps]
+		self._max_price = max(prices)
+		self._min_price = min(prices)
+		self._avg_price = int(round(sum(prices) / len(prices)))
+		self.save()
+
+	@property
+	def min_price(self):
+	    if self._min_price == None:
+	    	self.recalc_prices()
+	    return self._min_price
+
+	@property
+	def avg_price(self):
+	    if self._avg_price == None:
+	    	self.recalc_prices()
+	    return self._avg_price
+
+	@property
+	def max_price(self):
+	    if self._max_price == None:
+	    	self.recalc_prices()
+	    return self._max_price
+	
 	def get_data(self):
 		return {
 			'image': self.image,
@@ -134,13 +167,16 @@ class ShopHasProductManager(MyManager):
 		import operator
 		from django.db.models import Q
 
+		qset = qset.filter(~Q(id__in=ids))
+		
 		mylist = []
 		for w in signs['words']:
 			mylist.append(Q(name__icontains=w))
 			mylist.append(Q(brand_str__icontains=w))
 			mylist.append(Q(category_str__icontains=w))
 
-		qset = qset.filter(~Q(id__in=ids) & reduce(operator.or_, mylist))
+		if len(mylist):
+			qset = qset.filter(reduce(operator.or_, mylist))
 
 		items = {r.id:r for r in qset}
 		datas = {r.id:r.get_data() for r in qset}
