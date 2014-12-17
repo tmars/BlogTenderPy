@@ -156,24 +156,24 @@ class ShopHasProductForm(forms.ModelForm):
 				self.fields['product_name'].initial = obj.name
 
 				# Выводим сходные товары
-				qset = ShopHasProduct.objects.filter(product__isnull=False)
-				similars = ShopHasProduct.objects.similars_by_one(obj, qset)
+				# qset = ShopHasProduct.objects.filter(product__isnull=False)
+				# similars = ShopHasProduct.objects.similars_by_one(obj, qset)
 				
-				products = {}
-				prods = {}
-				for shp in similars:
-					if shp.product.id not in products:
-						products[shp.product.id] = 0
-						prods[shp.product.id] = shp.product
-					products[shp.product.id] += 1
+				# products = {}
+				# prods = {}
+				# for shp in similars:
+				# 	if shp.product.id not in products:
+				# 		products[shp.product.id] = 0
+				# 		prods[shp.product.id] = shp.product
+				# 	products[shp.product.id] += 1
 
-				import operator
-				products = sorted(products.items(), key=operator.itemgetter(1), reverse=True)
+				# import operator
+				# products = sorted(products.items(), key=operator.itemgetter(1), reverse=True)
 
-				help_text = ''
-				for p,v in products:
-					help_text += unicode(prods[p]) + '<br>'
-				self.fields['product'].help_text = help_text
+				# help_text = ''
+				# for p,v in products:
+				# 	help_text += unicode(prods[p]) + '<br>'
+				# self.fields['product'].help_text = help_text
 
 				# Выводим сходные товары
 				qset = ShopHasProduct.objects.filter(product__isnull=True)
@@ -262,7 +262,10 @@ class ShopHasProductAdmin(admin.ModelAdmin):
 	ordering = ['verified', 'name']
 	list_filter = ['product__category', 'shop']
 	list_display = ['name', 'verified', 'product', 'shop']
-
+	raw_id_fields = ('product',)
+	related_lookup_fields = {
+		'fk': ['product'],
+	}
 admin.site.register(ShopHasProduct, ShopHasProductAdmin)
 
 ####################
