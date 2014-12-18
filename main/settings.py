@@ -44,10 +44,15 @@ INSTALLED_APPS = (
     'lib.mptt',
     'lib.cuser',
     'lib.social_auth',
+    'lib.djangosphinx',
 
     'blog',
     'wiki',
 )
+
+SPHINX_API_VERSION = 0x116
+SPHINX_PORT = 9312
+SPHINX_SERVER = '127.0.0.1'
 
 AUTHENTICATION_BACKENDS = (
     'lib.social_auth.backends.contrib.vk.VKOAuth2Backend',

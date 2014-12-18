@@ -1,5 +1,6 @@
 from django.db import models
 import json, re, operator
+from lib.djangosphinx.models import SphinxSearch
 
 class MyManager(models.Manager):
 	def split_words(self, string):
@@ -203,6 +204,13 @@ class ShopHasProductManager(MyManager):
 
 class ShopHasProduct(models.Model):
 	objects = ShopHasProductManager()
+	search = SphinxSearch(
+		index='shps',
+		weights={
+			'title_en': 100,
+			'title_ru': 100,
+		}
+	)
 
 	product = models.ForeignKey(Product, blank=True, null=True)
 	shop = models.ForeignKey(Shop)
