@@ -85,19 +85,7 @@ WSGI_APPLICATION = 'main.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'a118692_1',
-        'USER': 'a118692_1',
-        'PASSWORD': 'Bxu1wjpxys59',
-        'HOST': 'a118692.mysql.mchost.ru',
-        'OPTIONS': {
-            'init_command': 'SET foreign_key_checks = 0;',
-        },
-    }
-        
-}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
